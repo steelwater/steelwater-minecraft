@@ -1,0 +1,39 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "Underground Tech Pack \u2014 Behavior",
+    "description": "v0.1 \u2022 Original decorative industrial blocks by Steelwater. Milestone 0 prototype.",
+    "uuid": "8f4306b2-c16d-403c-93cc-f07adf8dc560",
+    "version": [
+      0,
+      1,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "c6223be1-d729-40d3-bafc-0d5e55371708",
+      "version": [
+        0,
+        1,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "b2409bcb-ec4c-4b74-94fa-a3fb045a9ad8",
+      "version": [
+        0,
+        1,
+        0
+      ]
+    }
+  ]
+}
