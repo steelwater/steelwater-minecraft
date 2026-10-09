@@ -3,7 +3,7 @@ on:
   push:
     branches: [main, 'feature/**']
   pull_request:
-    branches: [main]
+    branches: [main, 'feature/underground-tech-pack-m0']
 permissions:
   contents: read
 jobs:
@@ -19,4 +19,29 @@ jobs:
       - run: python -m unittest discover -s tests -v
       - run: python tools/utp.py build
       - run: python -m compileall -q tools tests
+      - run: git diff --check
+
+  launcher:
+    name: Android launcher build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Prepare existing Android SDK and ephemeral debug key
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-35" "build-tools;35.0.0"
+          keytool -genkeypair -keystore "$RUNNER_TEMP/launcher-debug.keystore" -storepass android -keypass android -alias androiddebugkey -dname "CN=Android Debug,O=Android,C=US" -keyalg RSA -keysize 2048 -validity 30
+      - name: Build app and instrumentation APKs; verify signatures
+        env:
+          ANDROID_DEBUG_KEYSTORE: ${{ runner.temp }}/launcher-debug.keystore
+        run: |
+          python tools/android-addon-launcher/build.py
+          python tools/android-addon-launcher/build.py --test
+          python -m py_compile tools/android-addon-launcher/build.py
       - run: git diff --check
