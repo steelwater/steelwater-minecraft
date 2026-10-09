@@ -1,6 +1,6 @@
 # UTP Development Lab
 
-Reusable test-world **setup kit** for v0.1. A saved Minecraft world has **not yet been created or verified**. Complete creation and save/reopen testing before marking this deliverable complete.
+Reusable test-world **setup kit** for v0.1. Dan confirmed completion of the Android acceptance checklist, including saved-world testing, on 9 October 2026. The repository retains this reusable setup kit; no `.mcworld` export is archived. See the add-on validation notes for the attestation and evidence limits.
 
 ## Create once, reuse
 

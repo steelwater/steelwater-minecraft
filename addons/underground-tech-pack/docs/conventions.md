@@ -10,7 +10,7 @@ Milestone 0 implementation conventions, 6 October 2026. Product scope remains in
 - Initial development label: **v0.1**. Manifest representation: `[0, 1, 0]`; package filename: `0.1.0`.
 - Keep header/module/dependency versions synchronized. Increment patch for corrective pack updates, minor for later approved milestones, major for approved incompatible changes.
 - Keep pack UUIDs stable on updates; do not generate replacements to solve import problems. New block identifiers must not replace existing saved-world IDs.
-- The initial block format and minimum engine are **1.21.80**, a documented implementation baseline, not a tested Android compatibility claim. The Captain confirmed Android **1.26.52.3** as the target build on 6 October 2026; runtime verification is pending. No experiments or scripts are requested.
+- The initial block format and minimum engine are **1.21.80**, a documented implementation baseline, not a tested Android compatibility claim. The Captain confirmed Android **1.26.52.3** as the target build on 6 October 2026; Dan reported Android acceptance passed on 9 October 2026 (see validation notes). No experiments or scripts are requested.
 - Distribution licensing has not been selected. The brief says free, which does not itself grant redistribution or reuse rights; no license has been invented.
 
 | Pack | Header UUID | Module UUID |

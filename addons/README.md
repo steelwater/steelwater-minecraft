@@ -14,4 +14,4 @@ addons/
     └── resource-pack/
 ```
 
-- [Underground Tech Pack](underground-tech-pack/README.md): Milestone 0 prototype, pending Android validation.
+- [Underground Tech Pack](underground-tech-pack/README.md): Milestone 0 prototype, Android acceptance passed (Captain-reported).
