@@ -1,0 +1,36 @@
+name: Validate add-ons
+on:
+  push:
+    branches: [main, 'feature/**']
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    name: UTP foundation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python tools/utp.py validate
+      - run: python -m unittest discover -s tests -v
+      - run: python tools/utp.py build
+      - run: python -m compileall -q tools tests
+      - name: Check committed changes for whitespace errors
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BASE: ${{ github.event.before }}
+        run: |
+          if [ -n "$PR_BASE" ]; then
+            git diff --check "$PR_BASE...HEAD"
+          elif [ -n "$PUSH_BASE" ] && [ "$PUSH_BASE" != "0000000000000000000000000000000000000000" ]; then
+            git diff --check "$PUSH_BASE" HEAD
+          else
+            # A new branch push has no previous commit; check its full tree.
+            git diff --check "$(git hash-object -t tree /dev/null)" HEAD
+          fi

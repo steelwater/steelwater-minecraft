@@ -1,0 +1,39 @@
+{
+  "format_version": 2,
+  "header": {
+    "name": "UTP Development Lab \u2014 Setup Only",
+    "description": "Optional manual test fixture. Run only in a dedicated disposable test world.",
+    "uuid": "1beaa4f5-8967-407b-a32b-68698669d9a5",
+    "version": [
+      0,
+      1,
+      0
+    ],
+    "min_engine_version": [
+      1,
+      21,
+      80
+    ]
+  },
+  "modules": [
+    {
+      "type": "data",
+      "uuid": "8766c159-746f-4dbb-9f05-01cfa0b58a4f",
+      "version": [
+        0,
+        1,
+        0
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "uuid": "8f4306b2-c16d-403c-93cc-f07adf8dc560",
+      "version": [
+        0,
+        1,
+        0
+      ]
+    }
+  ]
+}
