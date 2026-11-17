@@ -30,3 +30,16 @@ Enable Content Log GUI/file options under Minecraft Creator settings when availa
 Save and exit, close Minecraft, reopen, and revisit all stations. Confirm packs and samples persist with the same texture/collision. Save the world under the same name and record results in [validation notes](../../addons/underground-tech-pack/tests/validation.md).
 
 An approved `.mcworld` export can later be archived with the exact tested packs in GitHub Releases. Generated world databases/archives stay outside Git. This branch contains no saved world export.
+
+## Milestone 1 station
+
+Build/import `underground-tech-pack-0.1.1-dev.mcaddon` in a **new dedicated test world** with all three packs active and cheats enabled. Run `/tp @s 56 90 17` to load the area, then `/function utp/m1`.
+
+**M1 setup replaces x=40–75, y=79–88, z=0–32.** It never runs automatically and does not touch the original M0 station. Do not run it in an existing build. The player bundle excludes both setup commands.
+
+- Eight 5×5 upright samples: x=42,50,58,66; z=2,10; y=80–84. Order matches the [catalog](../../addons/underground-tech-pack/docs/assets.md), left to right then second row.
+- Dim compact room: x=42–52, z=20–30, y=79–85. Lit comparison: x=59–69, same z/y range. Both use all eight pieces, with north entrances. The lit room adds a vanilla sea lantern; it requires no other decorative pack.
+- Rooms use grated floors, navy walls, riveted rear panels, reinforced side panels, framed trim, vent details, warning entrance accents and industrial ceilings. Add temporary lighting in the dim room to inspect placement, then remove it for the darkness check.
+- Use the supplied stacks to place, break and replace every piece. Independently lay out 5×5 floor and ceiling patches to check those face orientations, walkability and tiling.
+
+Capture actual Minecraft screenshots of the eight samples, room interior, and bright/dim close-ups. Record exact device/build, content-log warnings and save/reopen results in the [M1 checklist](../../addons/underground-tech-pack/tests/m1-validation.md). The source-art sheet is not a substitute for those screenshots. M1 runtime acceptance remains pending.
