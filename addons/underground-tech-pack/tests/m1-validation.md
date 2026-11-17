@@ -11,6 +11,11 @@
 - Enlarged source-art contact sheet inspected: original riveted panel retained; seven new surfaces are distinct and use the original palette. Amber occupies only the warning band. This is source-art inspection, not proof of Minecraft lighting/tiling/rendering.
 - M0 block JSON, `.pixels`, compiled PNG, original setup function, namespace, engine/format baseline and all UUIDs are preserved. Manifest/dependency versions advance together to the **0.1.1 M1 development test build**, not roadmap v0.2 final.
 
+| Local package | SHA-256 |
+| --- | --- |
+| `underground-tech-pack-0.1.1.mcaddon` | `92c6f74e3f9909e4c672e7aee81423a51f2adcfae6c7a7d1f0fff14872d8818d` |
+| `underground-tech-pack-0.1.1-dev.mcaddon` | `138d9f8576fa21aee181dfbf4021eabef1a99fc7ac63af2fe7d62a29aa34e304` |
+
 ## Launcher carry-forward checks
 
 A fresh launcher and instrumentation APK were built from the merged lifecycle-fix source into **`dist/m1-launcher/`**, preserving the older APK elsewhere. Both builds passed javac type checking and APK v2/v3 signature verification. Existing Java 8/deprecated-inset warnings remain. No launcher code, permissions, dependencies or test behavior changed in M1.
@@ -40,7 +45,7 @@ Use a new dedicated world with the current development bundle. Record tester/dat
 | Launcher cancel/retry | Cancel picker; retry succeeds; failed selection offers usable recovery | Pending |
 | Launcher interruption | Kill process during copying; reopen and confirm accurate retry, then successful import | Pending |
 
-Capture actual Minecraft screenshots: all eight samples, compact-room interior, bright/dim close-ups and any warnings. The [source-art sheet](../art/blocks.svg) is explicitly not a screenshot. Use the [lab instructions](../../../../worlds/underground-tech-pack-lab/README.md#milestone-1-station); source-only/manual lab commands have not been executed in Minecraft here.
+Capture actual Minecraft screenshots: all eight samples, compact-room interior, bright/dim close-ups and any warnings. The [source-art sheet](../art/blocks.svg) is explicitly not a screenshot. Use the [lab instructions](../../../worlds/underground-tech-pack-lab/README.md#milestone-1-station); source-only/manual lab commands have not been executed in Minecraft here.
 
 ## Boundaries and rollback
 
