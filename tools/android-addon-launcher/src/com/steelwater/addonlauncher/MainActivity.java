@@ -2,10 +2,13 @@ package com.steelwater.addonlauncher;
 
 import android.app.Activity;
 import android.content.ClipData;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.OpenableColumns;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +28,8 @@ public final class MainActivity extends Activity {
     private Button choose;
     private static final int PICK = 10;
     private static final long LIMIT = 256L * 1024 * 1024;
+    private ImportWork work;
+    private boolean resumed;
 
     @Override public void onCreate(Bundle state) {
         super.onCreate(state);
@@ -56,6 +61,13 @@ public final class MainActivity extends Activity {
         status.setPadding(0, padding, 0, padding);
         status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         status.setText(state == null ? "Ready. Minecraft must be installed in this Android profile." : state.getString("status", "Ready."));
+        work = (ImportWork) getLastNonConfigurationInstance();
+        if (work != null) {
+            choose.setEnabled(false);
+            status.setText("Preparing the add-on…");
+        } else if (state != null && state.getBoolean("preparing")) {
+            status.setText("The import was interrupted. Choose the add-on again to retry.");
+        }
         layout.addView(status);
         choose.setOnClickListener(v -> {
             Intent picker = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -67,7 +79,22 @@ public final class MainActivity extends Activity {
         });
         setContentView(scroll);
     }
+    @Override public Object onRetainNonConfigurationInstance() { return work; }
+    @Override protected void onResume() {
+        super.onResume();
+        resumed = true;
+        if (work != null) {
+            work.owner = this;
+            completeImport();
+        }
+    }
+    @Override protected void onPause() {
+        resumed = false;
+        if (work != null && work.owner == this) work.owner = null;
+        super.onPause();
+    }
     @Override protected void onSaveInstanceState(Bundle state) {
+        state.putBoolean("preparing", work != null);
         state.putString("status", status.getText().toString());
         super.onSaveInstanceState(state);
     }
@@ -78,48 +105,83 @@ public final class MainActivity extends Activity {
             status.setText("No file selected. You can try again.");
             return;
         }
+        if (work != null) return;
         Uri source = data.getData();
         choose.setEnabled(false);
         status.setText("Preparing the add-on…");
-        new Thread(() -> prepare(source), "addon-copy").start();
+        work = new ImportWork(getApplicationContext(), source);
+        if (resumed) work.owner = this;
+        work.start();
     }
-    private void prepare(Uri source) {
-        File copy = null;
-        try {
-            String name = null;
-            try (Cursor c = getContentResolver().query(source, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
-                if (c != null && c.moveToFirst()) name = c.getString(0);
-            }
-            if (name == null || !name.toLowerCase(Locale.ROOT).endsWith(".mcaddon")) {
-                throw new java.io.IOException("Please select a file whose name ends in .mcaddon.");
-            }
-            // Expired copies belong to this helper only. Keep recent files for Minecraft's asynchronous read.
-            File[] old = getCacheDir().listFiles();
-            if (old != null) for (File f : old) {
-                if (f.getName().matches("[a-f0-9-]{36}\\.mcaddon") && System.currentTimeMillis() - f.lastModified() > 86400000L) f.delete();
-            }
-            copy = new File(getCacheDir(), UUID.randomUUID() + ".mcaddon");
-            try (InputStream input = getContentResolver().openInputStream(source);
-                 OutputStream output = Files.newOutputStream(copy.toPath())) {
-                if (input == null) throw new java.io.IOException("The selected file could not be read.");
-                byte[] buffer = new byte[32768];
-                long total = 0;
-                int n;
-                while ((n = input.read(buffer)) != -1) {
-                    total += n;
-                    if (total > LIMIT) throw new java.io.IOException("This test helper supports files up to 256 MB.");
-                    output.write(buffer, 0, n);
+    private void completeImport() {
+        if (!resumed || isFinishing() || work == null || !work.done) return;
+        ImportWork completed = work;
+        // Consume on the main thread before launching; later rotations cannot launch it again.
+        completed.owner = null;
+        work = null;
+        choose.setEnabled(true);
+        if (completed.error != null) status.setText(completed.error);
+        else launch(completed.uri);
+    }
+    // Retained only across configuration changes. No worker captures an Activity or its views.
+    private static final class ImportWork {
+        private final Context context;
+        private final Uri source;
+        private final Handler main = new Handler(Looper.getMainLooper());
+        private MainActivity owner;
+        private boolean done;
+        private Uri uri;
+        private String error;
+
+        ImportWork(Context context, Uri source) {
+            this.context = context;
+            this.source = source;
+        }
+        void start() { new Thread(this::prepare, "addon-copy").start(); }
+        private void prepare() {
+            File copy = null;
+            try {
+                String name = null;
+                try (Cursor c = context.getContentResolver().query(source, new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null)) {
+                    if (c != null && c.moveToFirst()) name = c.getString(0);
                 }
+                if (name == null || !name.toLowerCase(Locale.ROOT).endsWith(".mcaddon")) {
+                    throw new java.io.IOException("Please select a file whose name ends in .mcaddon.");
+                }
+                // Expired copies belong to this helper only. Keep recent files for Minecraft's asynchronous read.
+                File[] old = context.getCacheDir().listFiles();
+                if (old != null) for (File f : old) {
+                    if (f.getName().matches("[a-f0-9-]{36}\\.mcaddon") && System.currentTimeMillis() - f.lastModified() > 86400000L) f.delete();
+                }
+                copy = new File(context.getCacheDir(), UUID.randomUUID() + ".mcaddon");
+                try (InputStream input = context.getContentResolver().openInputStream(source);
+                     OutputStream output = Files.newOutputStream(copy.toPath())) {
+                    if (input == null) throw new java.io.IOException("The selected file could not be read.");
+                    byte[] buffer = new byte[32768];
+                    long total = 0;
+                    int n;
+                    while ((n = input.read(buffer)) != -1) {
+                        total += n;
+                        if (total > LIMIT) throw new java.io.IOException("This test helper supports files up to 256 MB.");
+                        output.write(buffer, 0, n);
+                    }
+                }
+                try (ZipFile zip = new ZipFile(copy)) {
+                    if (!zip.entries().hasMoreElements()) throw new java.io.IOException("The archive is empty.");
+                }
+                Uri uri = Uri.parse("content://com.steelwater.addonlauncher.files/" + copy.getName());
+                main.post(() -> finish(uri, null));
+            } catch (Exception e) {
+                if (copy != null) copy.delete();
+                String message = "Could not prepare the add-on: " + e.getMessage();
+                main.post(() -> finish(null, message));
             }
-            try (ZipFile zip = new ZipFile(copy)) {
-                if (!zip.entries().hasMoreElements()) throw new java.io.IOException("The archive is empty.");
-            }
-            Uri uri = Uri.parse("content://com.steelwater.addonlauncher.files/" + copy.getName());
-            runOnUiThread(() -> launch(uri));
-        } catch (Exception e) {
-            if (copy != null) copy.delete();
-            String message = "Could not prepare the add-on: " + e.getMessage();
-            runOnUiThread(() -> { choose.setEnabled(true); status.setText(message); });
+        }
+        private void finish(Uri uri, String error) {
+            this.uri = uri;
+            this.error = error;
+            done = true;
+            if (owner != null) owner.completeImport();
         }
     }
     private void launch(Uri uri) {

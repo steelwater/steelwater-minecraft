@@ -22,6 +22,14 @@ Custom Minecraft worlds and map projects live in [`worlds/`](./worlds/).
 
 Installation notes, contribution information, and other project documentation live in [`docs/`](./docs/).
 
+## Android add-on launcher
+
+The optional [Steelwater Add-on Launcher](tools/android-addon-launcher/README.md) opens a selected `.mcaddon` in the installed Android Minecraft app. Pending copies survive screen rotation; interrupted imports offer a retry. See its guide for build, installation, privacy, and testing limitations.
+
+## Project status
+
+Underground Tech Pack follows the [project roadmap](https://docs.google.com/document/d/1CPZ1EgoX2-QF5DlEAsDjBctHagWDV2a0npEUHUG3n9c/edit). The launcher is a separate utility tracked in [PR #2](https://github.com/steelwater/steelwater-minecraft/pull/2); it does not complete the Core Metal Building Set milestone. See [CHANGELOG.md](CHANGELOG.md) for meaningful changes.
+
 ## Downloads
 
 Individual skins can be downloaded directly from their folders. Packaged add-ons and worlds can be published through GitHub Releases as the collection grows.
