@@ -2,5 +2,26 @@
   "format_version": "1.21.80",
   "steelwater_utp:navy_metal": {
     "sound": "metal"
+  },
+  "steelwater_utp:smooth_navy_metal": {
+    "sound": "metal"
+  },
+  "steelwater_utp:reinforced_panel": {
+    "sound": "metal"
+  },
+  "steelwater_utp:grated_floor": {
+    "sound": "metal"
+  },
+  "steelwater_utp:ceiling_panel": {
+    "sound": "metal"
+  },
+  "steelwater_utp:metal_trim": {
+    "sound": "metal"
+  },
+  "steelwater_utp:vent_panel": {
+    "sound": "metal"
+  },
+  "steelwater_utp:hazard_panel": {
+    "sound": "metal"
   }
 }

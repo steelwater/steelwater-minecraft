@@ -1,5 +1,7 @@
 # Milestone 0 validation
 
+Historical M0 evidence below. M1 is authorized separately by issue #3; current expanded-pack testing is recorded in [M1 validation](m1-validation.md).
+
 9 October 2026 — **Android acceptance passed, reported by Dan.** [Captain acceptance](https://github.com/steelwater/steelwater-minecraft/pull/1#issuecomment-6074793838); screenshots and placement confirmation are in the [earlier test report](https://github.com/steelwater/steelwater-minecraft/pull/1#issuecomment-6051288307).
 
 Dan explicitly confirmed that Android device testing was complete with no issues and requested that the Android checklist be recorded as passed. The results below rely on that attestation; they are not independent Crew observations. Device model, Android OS version, graphics mode, and a device-computed package checksum were not supplied.

@@ -2,12 +2,12 @@
   "format_version": 2,
   "header": {
     "name": "UTP Development Lab \u2014 Setup Only",
-    "description": "Optional manual test fixture. Run only in a dedicated disposable test world.",
+    "description": "M1 development lab \u2014 manual setup only; replaces the documented test area.",
     "uuid": "1beaa4f5-8967-407b-a32b-68698669d9a5",
     "version": [
       0,
       1,
-      0
+      1
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         0,
         1,
-        0
+        1
       ]
     }
   ],
@@ -32,7 +32,7 @@
       "version": [
         0,
         1,
-        0
+        1
       ]
     }
   ]

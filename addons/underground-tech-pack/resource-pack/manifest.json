@@ -2,12 +2,12 @@
   "format_version": 2,
   "header": {
     "name": "Underground Tech Pack \u2014 Resources",
-    "description": "v0.1 \u2022 Original decorative industrial blocks by Steelwater. Milestone 0 prototype.",
+    "description": "M1 development test build \u2014 eight original decorative metal blocks.",
     "uuid": "b2409bcb-ec4c-4b74-94fa-a3fb045a9ad8",
     "version": [
       0,
       1,
-      0
+      1
     ],
     "min_engine_version": [
       1,
@@ -22,7 +22,7 @@
       "version": [
         0,
         1,
-        0
+        1
       ]
     }
   ]

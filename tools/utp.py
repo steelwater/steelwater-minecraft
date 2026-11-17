@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate and package Milestone 0 using only Python's standard library."""
+"""Validate and package the core metal building set using only Python's standard library."""
 
 import argparse
 import binascii
@@ -17,7 +17,18 @@ ROOT = Path(__file__).resolve().parents[1]
 PACK = Path("addons/underground-tech-pack")
 LAB = Path("worlds/underground-tech-pack-lab/behavior-pack")
 IDENTIFIER = "steelwater_utp:navy_metal"
-SYMBOLS = {"N": "navy_metal", "G": "gunmetal", "S": "dull_steel", "T": "dark_trim"}
+VERSION = (0, 1, 1)
+ASSETS = {
+    "navy_metal": "UTP Navy Metal",
+    "smooth_navy_metal": "UTP Smooth Navy Metal",
+    "reinforced_panel": "UTP Reinforced Gunmetal",
+    "grated_floor": "UTP Grated Floor",
+    "ceiling_panel": "UTP Industrial Ceiling",
+    "metal_trim": "UTP Metal Trim",
+    "vent_panel": "UTP Vent Panel",
+    "hazard_panel": "UTP Warning Accent",
+}
+SYMBOLS = {"N": "navy_metal", "G": "gunmetal", "S": "dull_steel", "T": "dark_trim", "A": "amber"}
 
 
 def read_json(path):
@@ -29,9 +40,9 @@ def require(condition, message):
         raise ValueError(message)
 
 
-def texture_bytes(root=ROOT):
+def texture_bytes(root=ROOT, asset="navy_metal"):
     palette = read_json(root / PACK / "art/palette.json")
-    rows = (root / PACK / "art/navy_metal.pixels").read_text().splitlines()
+    rows = (root / PACK / "art" / (asset + ".pixels")).read_text().splitlines()
     require(len(rows) == 16 and all(len(row) == 16 for row in rows), "Texture must be 16×16")
     require(set("".join(rows)) <= SYMBOLS.keys(), "Unknown texture pixel symbol")
     for color in palette.values():
@@ -53,20 +64,40 @@ def palette_svg(root=ROOT):
     elements = ['<svg xmlns="http://www.w3.org/2000/svg" width="800" height="440" viewBox="0 0 800 440">',
                 '<rect width="800" height="440" fill="#101820"/>',
                 '<g font-family="sans-serif" fill="#E2E9EE">',
-                '<text x="28" y="40" font-size="24">Underground Tech Pack · v0.1 palette</text>',
-                '<text x="28" y="67" font-size="14">Navy metal first. Status accents reserved for future assets.</text>']
+                '<text x="28" y="40" font-size="24">Underground Tech Pack · core metal palette</text>',
+                '<text x="28" y="67" font-size="14">Navy metal first. Amber marks restrained warning details.</text>']
     for i, (name, color) in enumerate(palette.items()):
         x, y = 28 + (i % 4) * 194, 94 + (i // 4) * 154
         elements.extend([f'<rect x="{x}" y="{y}" width="166" height="86" fill="{color}" stroke="#607080"/>',
                          f'<text x="{x}" y="{y+109}" font-size="15">{name.replace("_", " ").title()}</text>',
                          f'<text x="{x}" y="{y+130}" font-size="13">{color}</text>'])
-    elements.extend(['<text x="28" y="419" font-size="13">Original industrial palette · no emissive material in the prototype</text>', '</g></svg>'])
+    elements.extend(['<text x="28" y="419" font-size="13">Original industrial palette · no emissive materials</text>', '</g></svg>'])
     return "\n".join(elements) + "\n"
 
 
+def asset_sheet(root=ROOT):
+    """Source-art contact sheet, not a Minecraft screenshot."""
+    palette = read_json(root / PACK / "art/palette.json")
+    elements = ['<svg xmlns="http://www.w3.org/2000/svg" width="840" height="480" viewBox="0 0 840 480">',
+                '<rect width="840" height="480" fill="#101820"/>',
+                '<g font-family="sans-serif" fill="#E2E9EE">',
+                '<text x="20" y="28" font-size="18">Core Metal Building Set · source artwork (not in-game evidence)</text>']
+    for i, (asset, label) in enumerate(ASSETS.items()):
+        x, y = 20 + (i % 4) * 210, 48 + (i // 4) * 210
+        rows = (root / PACK / "art" / (asset + ".pixels")).read_text().splitlines()
+        for row, pixels in enumerate(rows):
+            for run in re.finditer(r"(.)\1*", pixels):
+                color = palette[SYMBOLS[run.group()[0]]]
+                elements.append(f'<rect x="{x + run.start() * 10}" y="{y + row * 10}" width="{len(run.group()) * 10}" height="10" fill="{color}"/>')
+        elements.append(f'<text x="{x}" y="{y + 181}" font-size="14">{label}</text>')
+    return "\n".join(elements + ['</g></svg>']) + "\n"
+
+
 def render(root=ROOT):
-    (root / PACK / "resource-pack/textures/blocks/navy_metal.png").write_bytes(texture_bytes(root))
+    for asset in ASSETS:
+        (root / PACK / "resource-pack/textures/blocks" / (asset + ".png")).write_bytes(texture_bytes(root, asset))
     (root / PACK / "art/palette.svg").write_text(palette_svg(root), encoding="utf-8")
+    (root / PACK / "art/blocks.svg").write_text(asset_sheet(root), encoding="utf-8")
 
 
 def validate(root=ROOT):
@@ -78,7 +109,7 @@ def validate(root=ROOT):
         require(manifest["format_version"] == 2, "Expected manifest format 2")
         header, modules = manifest["header"], manifest["modules"]
         require(len(modules) == 1 and modules[0]["type"] == kind, "Wrong pack module")
-        require(header["version"] == modules[0]["version"] == [0, 1, 0], "Version mismatch")
+        require(header["version"] == modules[0]["version"] == list(VERSION), "Version mismatch")
         require(header["min_engine_version"] == [1, 21, 80], "Engine baseline changed")
         for value in (header["uuid"], modules[0]["uuid"]):
             require(str(uuid.UUID(value)) == value, "Invalid UUID")
@@ -92,33 +123,45 @@ def validate(root=ROOT):
         for path in (root / folder).rglob("*.json"):
             read_json(path)
     blocks = list((pack / "behavior-pack/blocks").glob("*.json"))
-    require(len(blocks) == 1, "Milestone 0 must have exactly one block")
-    block_file = read_json(blocks[0])
-    require(block_file["format_version"] == "1.21.80", "Unexpected block format")
-    block = block_file["minecraft:block"]
-    require(block["description"]["identifier"] == IDENTIFIER, "Block identifier changed")
-    require(block["description"]["menu_category"]["category"] == "construction", "Block missing from Construction")
-    components = block["components"]
-    require(set(components) == {"minecraft:geometry", "minecraft:material_instances", "minecraft:collision_box",
-                                "minecraft:selection_box", "minecraft:destructible_by_mining",
-                                "minecraft:destructible_by_explosion", "minecraft:light_dampening"},
-            "Unexpected prototype component; review decorative-only scope")
-    require(components["minecraft:geometry"] == "minecraft:geometry.full_block", "Expected full cube")
-    require(components["minecraft:collision_box"] is True and components["minecraft:selection_box"] is True,
-            "Prototype must have full-cube collision and selection")
+    require({path.stem for path in blocks} == set(ASSETS), "Expected exactly the eight M1 blocks")
+    atlas = read_json(pack / "resource-pack/textures/terrain_texture.json")
+    sounds = read_json(pack / "resource-pack/blocks.json")
+    labels = (pack / "resource-pack/texts/en_US.lang").read_text().splitlines()
+    require(set(atlas["texture_data"]) == {"steelwater_utp_" + name for name in ASSETS}, "Unexpected atlas entries")
+    require(set(sounds) == {"format_version"} | {"steelwater_utp:" + name for name in ASSETS}, "Unexpected sound entries")
+    for path in blocks:
+        asset = path.stem
+        identifier = "steelwater_utp:" + asset
+        block_file = read_json(path)
+        require(block_file["format_version"] == "1.21.80", "Unexpected block format")
+        block = block_file["minecraft:block"]
+        require(set(block) == {"description", "components"}, "Unexpected block behavior; review decorative-only scope")
+        require(block["description"] == {"identifier": identifier, "menu_category": {"category": "construction"}},
+                "Block identifier or Creative discovery changed")
+        components = block["components"]
+        require(set(components) == {"minecraft:geometry", "minecraft:material_instances", "minecraft:collision_box",
+                                    "minecraft:selection_box", "minecraft:destructible_by_mining",
+                                    "minecraft:destructible_by_explosion", "minecraft:light_dampening"},
+                "Unexpected component; review decorative-only scope")
+        require(components["minecraft:geometry"] == "minecraft:geometry.full_block", "Expected full cube")
+        require(components["minecraft:collision_box"] is True and components["minecraft:selection_box"] is True,
+                "Blocks must have full-cube collision and selection")
+        require(components["minecraft:destructible_by_mining"] == {"seconds_to_destroy": 3}
+                and components["minecraft:destructible_by_explosion"] == {"explosion_resistance": 6}
+                and components["minecraft:light_dampening"] == 15, "Unexpected physical behavior")
+        texture_key = "steelwater_utp_" + asset
+        require(components["minecraft:material_instances"] == {"*": {"texture": texture_key, "render_method": "opaque"}},
+                "Expected one opaque material on all faces")
+        texture = atlas["texture_data"][texture_key]["textures"]
+        require(texture == "textures/blocks/" + asset, "Unexpected atlas texture reference")
+        require((pack / "resource-pack" / (texture + ".png")).read_bytes() == texture_bytes(root, asset),
+                "Texture missing, corrupt, or stale; run render")
+        require(labels.count(f"tile.{identifier}.name={ASSETS[asset]}") == 1, "Missing or duplicate display name")
+        require(sounds[identifier] == {"sound": "metal"}, "Missing metal sound")
     require(not (pack / "behavior-pack/functions").exists() and not (pack / "behavior-pack/scripts").exists(),
             "Player pack must not include test functions or scripts")
-    material = components["minecraft:material_instances"]["*"]
-    require(material["render_method"] == "opaque", "Prototype should be opaque")
-    atlas = read_json(pack / "resource-pack/textures/terrain_texture.json")
-    texture = atlas["texture_data"][material["texture"]]["textures"]
-    require(texture == "textures/blocks/navy_metal", "Unexpected atlas texture reference")
-    require((pack / "resource-pack" / (texture + ".png")).read_bytes() == texture_bytes(root),
-            "Texture missing, corrupt, or stale; run render")
     require((pack / "art/palette.svg").read_text() == palette_svg(root), "Palette sheet stale; run render")
-    require(f"tile.{IDENTIFIER}.name=UTP Navy Metal" in (pack / "resource-pack/texts/en_US.lang").read_text(),
-            "Missing display name")
-    require(read_json(pack / "resource-pack/blocks.json")[IDENTIFIER]["sound"] == "metal", "Missing metal sound")
+    require((pack / "art/blocks.svg").read_text() == asset_sheet(root), "Asset sheet stale; run render")
     require(not (root / LAB / "functions/tick.json").exists(), "Lab setup must be manual")
 
 
@@ -146,8 +189,9 @@ def build(root=ROOT):
     destination.mkdir(exist_ok=True)
     runtime = [("underground-tech-pack-bp.mcpack", pack_bytes(root / PACK / "behavior-pack")),
                ("underground-tech-pack-rp.mcpack", pack_bytes(root / PACK / "resource-pack"))]
-    bundles = {"underground-tech-pack-0.1.0.mcaddon": runtime,
-               "underground-tech-pack-0.1.0-dev.mcaddon": runtime + [("utp-lab.mcpack", pack_bytes(root / LAB))]}
+    version = ".".join(map(str, VERSION))
+    bundles = {f"underground-tech-pack-{version}.mcaddon": runtime,
+               f"underground-tech-pack-{version}-dev.mcaddon": runtime + [("utp-lab.mcpack", pack_bytes(root / LAB))]}
     checksums = []
     for name, entries in bundles.items():
         data = archive(entries)

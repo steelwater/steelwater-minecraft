@@ -1,6 +1,6 @@
 # Underground Tech Pack conventions
 
-Milestone 0 implementation conventions, 6 October 2026. Product scope remains in the [canonical Crew Brief](https://docs.google.com/document/d/1WGthGOh2_vrdjSrjwmkx6YfAtmFI9gC1AgpEYUUmZ-k/edit).
+Foundation conventions, 6 October 2026; M1 additions, 17 November 2026. Product scope remains in the [canonical Crew Brief](https://docs.google.com/document/d/1WGthGOh2_vrdjSrjwmkx6YfAtmFI9gC1AgpEYUUmZ-k/edit).
 
 ## Identity and versions
 
@@ -25,7 +25,7 @@ The behavior pack depends on the resource header UUID. The optional lab depends 
 
 The collection repository lives directly in `steelwater-minecraft/`. The supplied `starter repo/` contents were promoted to this root rather than retaining a redundant nested repository. The starter documentation was preserved in the initial `main` commit.
 
-- `addons/underground-tech-pack/behavior-pack/`: the one full-cube block definition. A behavior pack is necessary to register a custom block; it adds no interactive machinery.
+- `addons/underground-tech-pack/behavior-pack/`: the eight full-cube block definitions. A behavior pack is necessary to register a custom block; it adds no interactive machinery.
 - `addons/underground-tech-pack/resource-pack/`: texture atlas, compiled 16×16 PNG, sounds, English label, manifest.
 - `addons/underground-tech-pack/art/`: editable palette JSON and pixel-grid source, plus the SVG palette sheet.
 - `addons/underground-tech-pack/docs/`: implementation conventions and originality rules.
@@ -55,3 +55,7 @@ Consulted 6 October 2026:
 - [Microsoft: geometry component](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/blockreference/examples/blockcomponents/minecraftblock_geometry?view=minecraft-bedrock-stable)
 
 The validator checks this small project's contracts and references. It is not a full Bedrock schema validator and cannot prove runtime compatibility, UI discovery, collision, or persistence.
+
+## Milestone 1 additions
+
+See the [asset catalog](assets.md) for all eight canonical identifiers, texture sources, full-cube trim/vent choice, and development-version rationale. Current manifests and package filenames use `0.1.1` for the M1 test update, preserving the UUIDs above. The original `navy_metal` artwork and definition remain unchanged. Amber (`A`) is now used sparingly on the warning accent; all materials remain non-emissive. The roadmap v0.2 grouping also includes pipes and has not been declared released. The lab adds a separate manual `utp/m1` command; the accepted M0 setup remains unchanged.
