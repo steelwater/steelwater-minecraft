@@ -43,3 +43,9 @@ Build/import `underground-tech-pack-0.1.1-dev.mcaddon` in a **new dedicated test
 - Use the supplied stacks to place, break and replace every piece. Independently lay out 5×5 floor and ceiling patches to check those face orientations, walkability and tiling.
 
 Capture actual Minecraft screenshots of the eight samples, room interior, and bright/dim close-ups. Record exact device/build, content-log warnings and save/reopen results in the [M1 checklist](../../addons/underground-tech-pack/tests/m1-validation.md). The source-art sheet is not a substitute for those screenshots. M1 runtime acceptance remains pending.
+
+## Milestone 2 prototype station
+
+Import `underground-tech-pack-0.1.2-dev.mcaddon` in a new dedicated test world. Enable cheats and activate all three packs. Run `/tp @s 88 90 5` to load the area, then `/function utp/m2`.
+
+The command replaces x=80–96, y=79–86, z=0–14. It lays out a sample row and horizontal and vertical joins beside the M1 navy wall, grated floor, and ceiling panels. Use the supplied stacks to test hand placement independently of the command-set states. Record observations in the [M2 prototype checklist](../../addons/underground-tech-pack/tests/m2-prototype.md).

@@ -32,3 +32,12 @@ The brief prefers simple full cubes and permits the smallest reliable trim choic
 The original riveted prototype remains `navy_metal`; the smooth surface gets a new identifier. This preserves existing worlds and supplies both requested materials without modifying the accepted baseline artwork.
 
 Manifest header/module/dependency versions advance together to `[0, 1, 1]` for an importable M1 development update, retaining all six UUIDs and the engine baseline. This distinguishes the package from M0 while reserving roadmap v0.2 for structural blocks plus pipes. It is not a release/tag selection. Existing M0 packages remain untouched.
+
+## Milestone 2 prototype
+
+| Creative name | Identifier | Placement |
+| --- | --- | --- |
+| UTP Straight Pipe | `steelwater_utp:straight_pipe` | Place against a side face for a horizontal run perpendicular to that face. Use the top or underside for a vertical run. |
+| UTP Elbow Pipe | `steelwater_utp:elbow_pipe` | Place against a side face and turn to choose a horizontal bend. Place on the top or underside for a vertical bend with a fixed horizontal arm in this prototype. |
+
+Pipe ends use a centered 6×6 profile on the 16×16 block grid. Each open end reaches the boundary plane. The straight pipe's collar widens to eight pixels in the middle. The elbow uses one rectangular selection and collision box around both arms, which includes the inside corner. Inspect both placement and collision in Minecraft before reusing these choices for the remaining families. The Creative inventory entries use the block models and English names. [Prototype checks](../tests/m2-prototype.md)
