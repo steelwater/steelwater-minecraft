@@ -1,1 +1,8 @@
 tile.steelwater_utp:navy_metal.name=UTP Navy Metal
+tile.steelwater_utp:smooth_navy_metal.name=UTP Smooth Navy Metal
+tile.steelwater_utp:reinforced_panel.name=UTP Reinforced Gunmetal
+tile.steelwater_utp:grated_floor.name=UTP Grated Floor
+tile.steelwater_utp:ceiling_panel.name=UTP Industrial Ceiling
+tile.steelwater_utp:metal_trim.name=UTP Metal Trim
+tile.steelwater_utp:vent_panel.name=UTP Vent Panel
+tile.steelwater_utp:hazard_panel.name=UTP Warning Accent

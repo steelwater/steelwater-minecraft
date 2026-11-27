@@ -73,3 +73,7 @@ The test APK alone exports a gated fixture provider. Do not distribute or instal
 Portrait and landscape emulator screenshots were inspected; text and controls remained readable. App/test builds, javac type checking, and v2/v3 signature verification passed. Google's current `testing/testing-setup` skill was reviewed on 17 November 2026; existing platform instrumentation is retained under the no-new-dependencies boundary. Other domains (R8, Play, navigation, AGP migration) do not apply. CI builds/signs both APKs; it does not execute instrumentation. No standalone lint command exists.
 
 Still required: post-fix real-device Minecraft handoff and successful import, including rotation during a slow import. Process-kill recovery still needs explicit evidence. October tablet acceptance applies to the old artifact, not this fix. The published v0.1.0 APK, tag and release are unchanged; new local builds use a separate output directory. Rollback: revert the fix or uninstall the helper; originals and worlds remain untouched.
+
+## M1 device handoff — 17 November 2026
+
+PR #2 is now merged. A fresh build of its lifecycle fix and repeat emulator checks accompany the [M1 pack acceptance](../../addons/underground-tech-pack/tests/m1-validation.md). Build into `dist/m1-launcher/` using `LAUNCHER_OUTPUT_DIR` to preserve the historical APK. Real Minecraft import, slow-copy rotation handoff and process-kill recovery remain pending owner testing; the old v0.1.0 prerelease does not verify this fix.

@@ -6,6 +6,9 @@ Meaningful changes follow [Keep a Changelog](https://keepachangelog.com/en/1.1.0
 
 ### Added
 
+- Underground Tech Pack M1 development set: eight cohesive decorative metal blocks, editable textures, asset catalog, and a separate small-room/repetition lab. Android acceptance remains pending.
+- Validation and regression coverage for the complete eight-block package while preserving the original navy prototype.
+
 - Source and build instructions for the optional Android add-on launcher, with provider and lifecycle instrumentation tests.
 
 ### Fixed

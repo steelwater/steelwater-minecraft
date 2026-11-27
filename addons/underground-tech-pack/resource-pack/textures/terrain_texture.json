@@ -6,6 +6,27 @@
   "texture_data": {
     "steelwater_utp_navy_metal": {
       "textures": "textures/blocks/navy_metal"
+    },
+    "steelwater_utp_smooth_navy_metal": {
+      "textures": "textures/blocks/smooth_navy_metal"
+    },
+    "steelwater_utp_reinforced_panel": {
+      "textures": "textures/blocks/reinforced_panel"
+    },
+    "steelwater_utp_grated_floor": {
+      "textures": "textures/blocks/grated_floor"
+    },
+    "steelwater_utp_ceiling_panel": {
+      "textures": "textures/blocks/ceiling_panel"
+    },
+    "steelwater_utp_metal_trim": {
+      "textures": "textures/blocks/metal_trim"
+    },
+    "steelwater_utp_vent_panel": {
+      "textures": "textures/blocks/vent_panel"
+    },
+    "steelwater_utp_hazard_panel": {
+      "textures": "textures/blocks/hazard_panel"
     }
   }
 }

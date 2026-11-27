@@ -1,37 +1,36 @@
-# Underground Tech Pack — v0.1
+# Underground Tech Pack — M1 development build 0.1.1
 
-A free, original decorative building kit for underground technology environments. This branch contains **Milestone 0 only**: one navy metal prototype and the development pipeline. **Android acceptance passed, reported by Dan on 9 October 2026; ready for review after CI.**
+A free, original, decorative building kit for underground technology rooms. The core metal set contains **eight full-cube blocks** for walls, floors, ceilings, borders, and ventilation details. Milestone 1 is implemented for review; **Minecraft Android acceptance and in-game screenshots are pending**.
 
-[Canonical Crew Brief](https://docs.google.com/document/d/1WGthGOh2_vrdjSrjwmkx6YfAtmFI9gC1AgpEYUUmZ-k/edit) · [Conventions](docs/conventions.md) · [Originality rules](docs/originality.md) · [Validation](tests/validation.md) · [Development lab](../../worlds/underground-tech-pack-lab/README.md)
+[Roadmap](https://docs.google.com/document/d/1CPZ1EgoX2-QF5DlEAsDjBctHagWDV2a0npEUHUG3n9c/edit) · [M1 brief](https://docs.google.com/document/d/1oQAWaeWqeAK0ZclwmW7eTkEYGM6KrrjGK0w_q7U8DEA/edit) · [Issue #3](https://github.com/steelwater/steelwater-minecraft/issues/3) · [Asset catalog](docs/assets.md) · [Conventions](docs/conventions.md) · [Validation](tests/m1-validation.md) · [Lab](../../worlds/underground-tech-pack-lab/README.md) · [Changelog](../../CHANGELOG.md)
 
-![Palette](art/palette.svg)
+![Original source artwork; not a Minecraft screenshot](art/blocks.svg)
 
 ## Build and verify
 
-From the repository root, with Python 3.12+ and no third-party dependencies:
+From the repository root, using Python 3.12+ with no third-party dependencies:
 
 ```sh
+python3 tools/utp.py render
 python3 tools/utp.py validate
 python3 -m unittest discover -s tests -v
 python3 tools/utp.py build
 ```
 
-`dist/underground-tech-pack-0.1.0.mcaddon` contains only the player behavior/resource packs. `dist/underground-tech-pack-0.1.0-dev.mcaddon` adds the optional lab setup pack. Both contain identical player packs; use the development bundle for Milestone 0 testing. Checksums are in `dist/SHA256SUMS`.
+`dist/underground-tech-pack-0.1.1.mcaddon` contains the player behavior/resource packs. `dist/underground-tech-pack-0.1.1-dev.mcaddon` adds the optional lab setup pack. Player packs are identical in both downloads. Checksums are in `dist/SHA256SUMS`; generated packages are ignored by Git. This is an unreleased M1 test build, **not the roadmap's v0.2 release**, which also includes Milestone 2 pipes.
 
-After editing palette or pixel-grid artwork, run `python3 tools/utp.py render`, then validate and review. Generated archives stay outside Git. A future approved release must archive the exact device-tested package in GitHub Releases.
+Editable 16×16 `.pixels` files and the palette live in `art/`. Run `render` after editing them; PNGs and the two SVG sheets must match their sources. The original `navy_metal` definition, artwork, and identifier are retained.
 
 ## Android import and placement
 
-1. Record the Minecraft title-screen version/build. The provisional minimum is **1.21.80**; the Captain-confirmed Android test target is **1.26.52.3**, with Android acceptance subsequently confirmed by Dan.
-2. Transfer the development `.mcaddon` to Android and use the file manager's **Open with Minecraft** action. Wait for all three packs to import. File-manager behavior varies; record import errors.
-3. Create a new Creative, Flat, Peaceful world named **UTP Development Lab**. Enable coordinates and cheats; leave experiments off. Activate **Underground Tech Pack — Behavior**, verify **Underground Tech Pack — Resources** is active, and enable **UTP Development Lab — Setup Only**.
-4. Search Construction for **UTP Navy Metal**; also test `/give @s steelwater_utp:navy_metal 64`.
-5. Follow the [lab setup](../../worlds/underground-tech-pack-lab/README.md) and [Android checklist](tests/validation.md).
+1. Record device, OS, Minecraft version and graphics mode. The existing format/minimum remains **1.21.80**; that is a technical baseline, not an M1 compatibility result. The prior owner-confirmed test target was **1.26.52.3**.
+2. Import the development bundle with Minecraft. If Android has no file handler, use the [launcher](../../tools/android-addon-launcher/README.md), freshly built from the current source. The old v0.1.0 prerelease does not contain the lifecycle fix.
+3. Create a **new dedicated Creative/Flat/Peaceful world**, enable cheats and coordinates, leave experiments off, and activate the main behavior/resource packs plus the optional lab setup pack.
+4. Search Construction for **UTP**. All eight names appear in the [catalog](docs/assets.md). For example: `/give @s steelwater_utp:vent_panel 64`.
+5. Follow the [M1 lab setup](../../worlds/underground-tech-pack-lab/README.md#milestone-1-station) and complete the [acceptance checklist](tests/m1-validation.md).
 
-The prototype is a full cube with the same navy panel on all six faces. Screens, pipes, furniture, doors, machinery, animations, recipes, and gameplay interactions are outside this milestone.
+All pieces are solid one-metre cubes with the same texture on each face. Trim is a framed border block, not a slab; vents and grates are opaque surface designs, with no holes, animation, airflow or rotation controls. No recipes, scripts, powered devices, pipes, screens or furniture are included.
 
 ## Status and rollback
 
-Dan confirmed Android testing passed without issues in [PR #1](https://github.com/steelwater/steelwater-minecraft/pull/1#issuecomment-6074793838). See [validation](tests/validation.md) for Captain-reported results and evidence limitations. The Crew did not independently repeat Minecraft playtesting.
-
-The starter remains on `main`; Milestone 0 is isolated on `feature/underground-tech-pack-m0`. Test only in a dedicated new world. Preserve the world and matching packs together. No deployment or release has occurred.
+Milestone 0 Android acceptance was [reported by Dan](tests/validation.md); it does not verify the expanded M1 pack. Use a new test world and preserve any existing world with its matching packs before importing an update. Stable UUIDs mean Minecraft treats these as updates to the same packs. Previous source remains in Git; do not downgrade a world containing new block IDs. No merge, release, deployment or production-world change is authorized by this implementation.

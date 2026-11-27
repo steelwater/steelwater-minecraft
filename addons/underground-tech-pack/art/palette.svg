@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="440" viewBox="0 0 800 440">
 <rect width="800" height="440" fill="#101820"/>
 <g font-family="sans-serif" fill="#E2E9EE">
-<text x="28" y="40" font-size="24">Underground Tech Pack · v0.1 palette</text>
-<text x="28" y="67" font-size="14">Navy metal first. Status accents reserved for future assets.</text>
+<text x="28" y="40" font-size="24">Underground Tech Pack · core metal palette</text>
+<text x="28" y="67" font-size="14">Navy metal first. Amber marks restrained warning details.</text>
 <rect x="28" y="94" width="166" height="86" fill="#263B50" stroke="#607080"/>
 <text x="28" y="203" font-size="15">Navy Metal</text>
 <text x="28" y="224" font-size="13">#263B50</text>
@@ -27,5 +27,5 @@
 <rect x="610" y="248" width="166" height="86" fill="#BD6262" stroke="#607080"/>
 <text x="610" y="357" font-size="15">Red</text>
 <text x="610" y="378" font-size="13">#BD6262</text>
-<text x="28" y="419" font-size="13">Original industrial palette · no emissive material in the prototype</text>
+<text x="28" y="419" font-size="13">Original industrial palette · no emissive materials</text>
 </g></svg>
