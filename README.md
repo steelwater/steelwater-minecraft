@@ -28,7 +28,7 @@ The optional [Steelwater Add-on Launcher](tools/android-addon-launcher/README.md
 
 ## Project status
 
-Underground Tech Pack follows the [project roadmap](https://docs.google.com/document/d/1CPZ1EgoX2-QF5DlEAsDjBctHagWDV2a0npEUHUG3n9c/edit). The [Core Metal Building Set](addons/underground-tech-pack/README.md) now contains eight decorative blocks in an unreleased M1 development build; Android acceptance remains pending. The launcher is a separate utility from merged [PR #2](https://github.com/steelwater/steelwater-minecraft/pull/2), with its deferred device checks bundled into M1 testing. See [CHANGELOG.md](CHANGELOG.md) for meaningful changes.
+Underground Tech Pack follows the [project roadmap](https://docs.google.com/document/d/1CPZ1EgoX2-QF5DlEAsDjBctHagWDV2a0npEUHUG3n9c/edit). The [Core Metal Building Set](addons/underground-tech-pack/README.md) now contains eight decorative blocks in an unreleased M1 development build; Android acceptance remains pending. The launcher is a separate utility from merged [PR #2](https://github.com/steelwater/steelwater-minecraft/pull/2), with its deferred device checks bundled into M1 testing. The M2 feature branch adds a straight pipe and elbow for Bedrock compatibility testing. See the [prototype handoff](addons/underground-tech-pack/tests/m2-prototype.md). See [CHANGELOG.md](CHANGELOG.md) for meaningful changes.
 
 ## Downloads
 

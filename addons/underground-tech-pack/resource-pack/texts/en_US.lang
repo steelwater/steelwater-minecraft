@@ -6,3 +6,5 @@ tile.steelwater_utp:ceiling_panel.name=UTP Industrial Ceiling
 tile.steelwater_utp:metal_trim.name=UTP Metal Trim
 tile.steelwater_utp:vent_panel.name=UTP Vent Panel
 tile.steelwater_utp:hazard_panel.name=UTP Warning Accent
+tile.steelwater_utp:straight_pipe.name=UTP Straight Pipe
+tile.steelwater_utp:elbow_pipe.name=UTP Elbow Pipe

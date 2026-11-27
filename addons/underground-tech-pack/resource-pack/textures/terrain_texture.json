@@ -27,6 +27,12 @@
     },
     "steelwater_utp_hazard_panel": {
       "textures": "textures/blocks/hazard_panel"
+    },
+    "steelwater_utp_straight_pipe": {
+      "textures": "textures/blocks/straight_pipe"
+    },
+    "steelwater_utp_elbow_pipe": {
+      "textures": "textures/blocks/elbow_pipe"
     }
   }
 }

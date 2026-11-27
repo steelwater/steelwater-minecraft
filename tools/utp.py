@@ -17,8 +17,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PACK = Path("addons/underground-tech-pack")
 LAB = Path("worlds/underground-tech-pack-lab/behavior-pack")
 IDENTIFIER = "steelwater_utp:navy_metal"
-VERSION = (0, 1, 1)
-ASSETS = {
+VERSION = (0, 1, 2)
+CORE_METALS = {
     "navy_metal": "UTP Navy Metal",
     "smooth_navy_metal": "UTP Smooth Navy Metal",
     "reinforced_panel": "UTP Reinforced Gunmetal",
@@ -28,6 +28,11 @@ ASSETS = {
     "vent_panel": "UTP Vent Panel",
     "hazard_panel": "UTP Warning Accent",
 }
+PIPE_PROTOTYPES = {
+    "straight_pipe": "UTP Straight Pipe",
+    "elbow_pipe": "UTP Elbow Pipe",
+}
+ASSETS = CORE_METALS | PIPE_PROTOTYPES
 SYMBOLS = {"N": "navy_metal", "G": "gunmetal", "S": "dull_steel", "T": "dark_trim", "A": "amber"}
 
 
@@ -82,7 +87,7 @@ def asset_sheet(root=ROOT):
                 '<rect width="840" height="480" fill="#101820"/>',
                 '<g font-family="sans-serif" fill="#E2E9EE">',
                 '<text x="20" y="28" font-size="18">Core Metal Building Set · source artwork (not in-game evidence)</text>']
-    for i, (asset, label) in enumerate(ASSETS.items()):
+    for i, (asset, label) in enumerate(CORE_METALS.items()):
         x, y = 20 + (i % 4) * 210, 48 + (i // 4) * 210
         rows = (root / PACK / "art" / (asset + ".pixels")).read_text().splitlines()
         for row, pixels in enumerate(rows):
@@ -123,7 +128,8 @@ def validate(root=ROOT):
         for path in (root / folder).rglob("*.json"):
             read_json(path)
     blocks = list((pack / "behavior-pack/blocks").glob("*.json"))
-    require({path.stem for path in blocks} == set(ASSETS), "Expected exactly the eight M1 blocks")
+    require(CORE_METALS.keys() <= {path.stem for path in blocks}, "Expected all eight M1 blocks")
+    require({path.stem for path in blocks} == set(ASSETS), "Expected exactly the cataloged blocks")
     atlas = read_json(pack / "resource-pack/textures/terrain_texture.json")
     sounds = read_json(pack / "resource-pack/blocks.json")
     labels = (pack / "resource-pack/texts/en_US.lang").read_text().splitlines()
@@ -135,20 +141,29 @@ def validate(root=ROOT):
         block_file = read_json(path)
         require(block_file["format_version"] == "1.21.80", "Unexpected block format")
         block = block_file["minecraft:block"]
-        require(set(block) == {"description", "components"}, "Unexpected block behavior; review decorative-only scope")
-        require(block["description"] == {"identifier": identifier, "menu_category": {"category": "construction"}},
+        prototype = asset in PIPE_PROTOTYPES
+        expected_keys = {"description", "components"}
+        if prototype:
+            expected_keys.add("permutations")
+        require(set(block) == expected_keys, "Unexpected block behavior; review decorative-only scope")
+        description = block["description"]
+        require(description["identifier"] == identifier and description["menu_category"] == {"category": "construction"},
                 "Block identifier or Creative discovery changed")
         components = block["components"]
         require(set(components) == {"minecraft:geometry", "minecraft:material_instances", "minecraft:collision_box",
                                     "minecraft:selection_box", "minecraft:destructible_by_mining",
                                     "minecraft:destructible_by_explosion", "minecraft:light_dampening"},
                 "Unexpected component; review decorative-only scope")
-        require(components["minecraft:geometry"] == "minecraft:geometry.full_block", "Expected full cube")
-        require(components["minecraft:collision_box"] is True and components["minecraft:selection_box"] is True,
-                "Blocks must have full-cube collision and selection")
+        if prototype:
+            validate_pipe(pack, asset, block)
+        else:
+            require(set(description) == {"identifier", "menu_category"}, "Unexpected core metal states")
+            require(components["minecraft:geometry"] == "minecraft:geometry.full_block", "Expected full cube")
+            require(components["minecraft:collision_box"] is True and components["minecraft:selection_box"] is True,
+                    "Core metals must have full-cube collision and selection")
         require(components["minecraft:destructible_by_mining"] == {"seconds_to_destroy": 3}
                 and components["minecraft:destructible_by_explosion"] == {"explosion_resistance": 6}
-                and components["minecraft:light_dampening"] == 15, "Unexpected physical behavior")
+                and components["minecraft:light_dampening"] == (0 if prototype else 15), "Unexpected physical behavior")
         texture_key = "steelwater_utp_" + asset
         require(components["minecraft:material_instances"] == {"*": {"texture": texture_key, "render_method": "opaque"}},
                 "Expected one opaque material on all faces")
@@ -163,6 +178,39 @@ def validate(root=ROOT):
     require((pack / "art/palette.svg").read_text() == palette_svg(root), "Palette sheet stale; run render")
     require((pack / "art/blocks.svg").read_text() == asset_sheet(root), "Asset sheet stale; run render")
     require(not (root / LAB / "functions/tick.json").exists(), "Lab setup must be manual")
+
+
+def validate_pipe(pack, asset, block):
+    components = block["components"]
+    model_path = pack / "resource-pack/models/blocks" / (asset + ".geo.json")
+    model, = read_json(model_path)["minecraft:geometry"]
+    geometry = "geometry.steelwater_utp." + asset
+    require(components["minecraft:geometry"] == model["description"]["identifier"] == geometry,
+            "Pipe geometry reference mismatch")
+    require(model["description"]["texture_width"] == model["description"]["texture_height"] == 16,
+            "Expected a 16×16 pipe texture")
+    position = {"minecraft:placement_position": {"enabled_states": ["minecraft:block_face"]}}
+    direction = {"minecraft:placement_direction": {"enabled_states": ["minecraft:cardinal_direction"]}}
+    expected = position if asset == "straight_pipe" else position | direction
+    require(block["description"]["traits"] == expected, "Unexpected pipe placement states")
+    require(set(block["description"]) == {"identifier", "menu_category", "traits"},
+            "Unexpected pipe description")
+    rules = block["permutations"]
+    require(len(rules) == len({rule["condition"] for rule in rules}) == 6, "Missing pipe orientations")
+    for rule in rules:
+        transform = rule["components"]
+        require(set(transform) == {"minecraft:transformation"}, "Pipe orientations must only rotate the block")
+        rotation = transform["minecraft:transformation"]
+        require(set(rotation) == {"rotation"} and len(rotation["rotation"]) == 3
+                and all(angle % 90 == 0 for angle in rotation["rotation"]), "Invalid pipe rotation")
+    box = components["minecraft:collision_box"]
+    require(box == components["minecraft:selection_box"], "Pipe collision and selection must match")
+    cubes = [cube for bone in model["bones"] for cube in bone["cubes"]]
+    for axis in range(3):
+        start = min(cube["origin"][axis] for cube in cubes)
+        end = max(cube["origin"][axis] + cube["size"][axis] for cube in cubes)
+        require(box["origin"][axis] == start and box["size"][axis] == end - start,
+                "Pipe bounds must enclose the geometry")
 
 
 def archive(entries):

@@ -20,15 +20,15 @@ class CoreMetalTests(unittest.TestCase):
         for folder in (utp.PACK, utp.LAB):
             shutil.copytree(utp.ROOT / folder, self.root / folder)
 
-    def test_all_eight_blocks_ship_in_repeatable_packages(self):
+    def test_all_cataloged_blocks_ship_in_repeatable_packages(self):
         """Player downloads exclude the lab, and identical sources produce identical bytes."""
         utp.build(self.root)
         destination = self.root / "dist"
         first = {p.name: p.read_bytes() for p in destination.iterdir()}
         utp.build(self.root)
         self.assertEqual(first, {p.name: p.read_bytes() for p in destination.iterdir()})
-        for name, expected in (("underground-tech-pack-0.1.1.mcaddon", 2),
-                               ("underground-tech-pack-0.1.1-dev.mcaddon", 3)):
+        for name, expected in (("underground-tech-pack-0.1.2.mcaddon", 2),
+                               ("underground-tech-pack-0.1.2-dev.mcaddon", 3)):
             with zipfile.ZipFile(destination / name) as outer:
                 self.assertEqual(len(outer.namelist()), expected)
                 self.assertIsNone(outer.testzip())
@@ -38,10 +38,14 @@ class CoreMetalTests(unittest.TestCase):
                         self.assertIsNone(inner.testzip())
                         if entry != "utp-lab.mcpack":
                             self.assertFalse(any(p.endswith(".mcfunction") for p in inner.namelist()))
+                        else:
+                            self.assertIn("functions/utp/m2.mcfunction", inner.namelist())
                         if entry.endswith("-bp.mcpack"):
                             self.assertEqual({p for p in inner.namelist() if p.startswith("blocks/")},
                                              {f"blocks/{asset}.json" for asset in utp.ASSETS})
                         if entry.endswith("-rp.mcpack"):
+                            for asset in utp.PIPE_PROTOTYPES:
+                                self.assertIn(f"models/blocks/{asset}.geo.json", inner.namelist())
                             for asset in utp.ASSETS:
                                 self.assertEqual(inner.read(f"textures/blocks/{asset}.png"),
                                                  utp.texture_bytes(self.root, asset))
@@ -74,7 +78,7 @@ class CoreMetalTests(unittest.TestCase):
     def test_missing_piece_blocks_packaging(self):
         """A download cannot silently omit one of the eight building pieces."""
         (self.root / utp.PACK / "behavior-pack/blocks/vent_panel.json").unlink()
-        with self.assertRaisesRegex(ValueError, "eight M1 blocks"):
+        with self.assertRaisesRegex(ValueError, "all eight M1 blocks"):
             utp.build(self.root)
 
     def test_missing_display_name_blocks_packaging(self):
@@ -111,7 +115,29 @@ class CoreMetalTests(unittest.TestCase):
 
     def test_each_piece_has_distinct_artwork(self):
         """The eight inventory choices have distinct visible surface designs."""
-        self.assertEqual(len({utp.texture_bytes(self.root, asset) for asset in utp.ASSETS}), 8)
+        self.assertEqual(len({utp.texture_bytes(self.root, asset) for asset in utp.CORE_METALS}), 8)
+
+    def test_pipe_end_faces_share_a_centered_six_pixel_profile(self):
+        """Adjacent pipe ends meet at the block boundary with matching cross sections."""
+        grid = [(-8, 8), (0, 16), (-8, 8)]
+        for name, expected in (("straight_pipe", {(2, -8), (2, 8)}),
+                               ("elbow_pipe", {(2, -8), (0, 8)})):
+            with self.subTest(name=name):
+                path = self.root / utp.PACK / f"resource-pack/models/blocks/{name}.geo.json"
+                model, = utp.read_json(path)["minecraft:geometry"]
+                ends = set()
+                for cube in model["bones"][0]["cubes"]:
+                    for axis, (low, high) in enumerate(grid):
+                        start = cube["origin"][axis]
+                        end = start + cube["size"][axis]
+                        self.assertTrue(low <= start < end <= high)
+                        for boundary in {start, end} & {low, high}:
+                            ends.add((axis, boundary))
+                            for transverse in set(range(3)) - {axis}:
+                                center = sum(grid[transverse]) // 2
+                                self.assertEqual(cube["origin"][transverse], center - 3)
+                                self.assertEqual(cube["size"][transverse], 6)
+                self.assertEqual(ends, expected)
 
 
 if __name__ == "__main__":

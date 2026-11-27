@@ -23,5 +23,11 @@
   },
   "steelwater_utp:hazard_panel": {
     "sound": "metal"
+  },
+  "steelwater_utp:straight_pipe": {
+    "sound": "metal"
+  },
+  "steelwater_utp:elbow_pipe": {
+    "sound": "metal"
   }
 }
